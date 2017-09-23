@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import jxl.JXLException;
 import jxl.Sheet;
@@ -159,6 +160,56 @@ public class ExcelUtil {
 			return maps;
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static ArrayList<ValuesDir> getArrayExcel(File file){
+		if(!file.exists())
+			return null;
+		try {
+			Workbook wd = Workbook.getWorkbook(file);
+			Sheet sheet = wd.getSheet("arrays");
+			String[] names = new String[sheet.getRows()];
+			for(int i = 1;i<names.length;i++){
+				names[i] = sheet.getCell(0, i).getContents();
+			}
+
+			ArrayList<ValuesDir> result = new ArrayList<ValuesDir>();
+			String[] titles = new String[sheet.getColumns()];
+			for(int i =1;i<titles.length;i++){
+				titles[i] = sheet.getCell(i, 0).getContents();
+				Map<String,ArrayList<String>> arrayListMap = new TreeMap<String,ArrayList<String>>();
+				ArrayList<String> arraylist = new ArrayList<String>();
+				String lastName = "";
+				String name = "";
+				for(int j=1;j<names.length;j++){
+					if(!"".equals(names[j])){
+						lastName = name;
+						name = names[j];
+					}
+					String content = sheet.getCell(i,j).getContents();
+					if("".equals(names[j]) || j == 1){
+						if(!"".equals(content))
+							arraylist.add(content);
+					}else{
+						System.out.println("j = " + j);
+						System.out.println("lastName = " + lastName + ";arraylist = " + arraylist);
+						arrayListMap.put(lastName,(ArrayList<String>) arraylist.clone());
+						arraylist.clear();
+						if(!"".equals(content))
+							arraylist.add(content);
+					}
+					if(j == names.length -1 && arraylist.size() != 0){
+						System.out.println("name = " + name + ";arraylist = " + arraylist);
+						arrayListMap.put(name , (ArrayList<String>) arraylist.clone());
+					}
+				}
+				result.add(new ValuesDir(titles[i],null,arrayListMap));
+			}
+			return result;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;

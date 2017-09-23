@@ -123,6 +123,7 @@ public class DOMTest {
 	
 	private static void excel2xml(File excelFile , File FileDir){
 		createStringXmls(ExcelUtil.getStringExcel(excelFile) , FileDir);
+		createArrayXmls(ExcelUtil.getArrayExcel(excelFile),FileDir);
 	}
 	
 	private static void createStringXmls(Map<String, Map<String, String>> maps,File FileDir){
@@ -168,6 +169,63 @@ public class DOMTest {
 				handler.endDocument();
 			} catch (Exception e) {
 				// TODO: handle exception
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private static void createArrayXmls(ArrayList<ValuesDir> valuesarrayList,File FileDir){
+		for(ValuesDir valuesDir : valuesarrayList){
+			String fileDirName = valuesDir.getTitle();
+			Map<String, ArrayList<String>> map = valuesDir.getArrayMap();
+			System.out.println(map.toString());
+			/*for(Map.Entry<String,ArrayList<String>> entry : map.entrySet()){
+
+			}*/
+			File resFile = new File(FileDir.getAbsolutePath() + "/res_translate");
+			if(!resFile.exists())
+				resFile.mkdir();
+			File valueFile = new File(resFile.getAbsolutePath()+"/"+fileDirName);
+			if(!valueFile.exists())
+				valueFile.mkdir();
+			File xmlFile = new File(valueFile.getAbsolutePath()+"/arrays.xml");
+			if(xmlFile.exists()){
+				xmlFile.delete();
+			}
+
+
+			try {
+				SAXTransformerFactory  factory= (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+				TransformerHandler handler=factory.newTransformerHandler();
+				Transformer transformer=handler.getTransformer();
+				transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+				transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
+				Result result = new StreamResult(new FileOutputStream(xmlFile));
+				handler.setResult(result);
+
+				handler.startDocument();
+				AttributesImpl atts = new AttributesImpl();
+				atts.clear();
+				atts.addAttribute("", "xmlns:xliff", "xmlns:xliff", "string", "urn:oasis:names:tc:xliff:document:1.2");
+				handler.startElement("", "resources", "resources", atts);
+
+				for(Map.Entry<String, ArrayList<String>> entry : map.entrySet()){
+					String name = entry.getKey();
+					ArrayList<String> itemArrayList = entry.getValue();
+					atts.clear();
+					atts.addAttribute("", "name", "name", "string", name);
+					handler.startElement("", "string-array", "string-array", atts);
+					for(String item : itemArrayList){
+						handler.startElement("", "item", "item", null);
+						handler.characters(item.toCharArray(), 0, item.length());
+						handler.endElement("", "item", "item");
+					}
+					handler.endElement("", "string-array", "string-array");
+				}
+				handler.endElement("", "resources", "resources");
+				handler.endDocument();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
