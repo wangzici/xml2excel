@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: com.wzt.xmlparse.ChooseFileSwing
+Class-Path: . lib/jxl.jar
+Created-By: wzt
