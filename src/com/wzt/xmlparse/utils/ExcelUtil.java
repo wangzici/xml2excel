@@ -1,4 +1,6 @@
-package com.wzt.xmlparse;
+package com.wzt.xmlparse.utils;
+
+import com.wzt.xmlparse.models.ValuesDir;
 
 import java.io.File;
 import java.io.IOException;

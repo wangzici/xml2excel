@@ -1,5 +1,7 @@
 package com.wzt.xmlparse;
+import com.wzt.xmlparse.models.ValuesDir;
 import com.wzt.xmlparse.utils.CommonUtils;
+import com.wzt.xmlparse.utils.ExcelUtil;
 import com.wzt.xmlparse.utils.FileUtils;
 
 import java.io.File;
@@ -172,7 +174,7 @@ public class DOMTest {
 		}
 	}
 
-	private static void createArrayXmls(ArrayList<ValuesDir> valuesarrayList,File FileDir){
+	private static void createArrayXmls(ArrayList<ValuesDir> valuesarrayList, File FileDir){
 		for(ValuesDir valuesDir : valuesarrayList){
 			String fileDirName = valuesDir.getTitle();
 			Map<String, ArrayList<String>> map = valuesDir.getmArraysmap();
