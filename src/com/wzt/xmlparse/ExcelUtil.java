@@ -17,23 +17,28 @@ import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
 public class ExcelUtil {
-	public static void createEcel(File file) throws IOException,RowsExceededException,WriteException{
-		WritableWorkbook workbood = Workbook.createWorkbook(file);
-		WritableSheet stringSheet = workbood.createSheet("strings", 0);
-		WritableSheet arraySheet = workbood.createSheet("arrays", 1);
-		
-		Label labelName = new Label(0,0,"name");
-		stringSheet.addCell(labelName);
-		Label labelName1 = new Label(0,0,"name");
-		arraySheet.addCell(labelName1);
-		
-		workbood.write();
-		workbood.close();
+	public static void createExcel(File file){
+		try {
+			WritableWorkbook workBook = Workbook.createWorkbook(file);
+			WritableSheet stringSheet = workBook.createSheet("strings", 0);
+			WritableSheet arraySheet = workBook.createSheet("arrays", 1);
+
+			Label labelName = new Label(0, 0, "name");
+			stringSheet.addCell(labelName);
+			Label labelName1 = new Label(0, 0, "name");
+			arraySheet.addCell(labelName1);
+
+			workBook.write();
+			workBook.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	public static void writeArrayExcel(File file,Map<String, ArrayList<String>> map,String parentName) throws IOException,RowsExceededException,WriteException, JXLException{
 		if(!file.exists()){
-			createEcel(file);
+			createExcel(file);
 		}
 		
 		Workbook wd = Workbook.getWorkbook(file);
@@ -85,7 +90,7 @@ public class ExcelUtil {
 	
 	public static void writeStringExcel(File file,Map<String, String> map , String parentName) throws IOException,RowsExceededException,WriteException, JXLException{
 		if(!file.exists()){
-			createEcel(file);
+			createExcel(file);
 		}
 		
 		Workbook wd = Workbook.getWorkbook(file);
@@ -159,7 +164,6 @@ public class ExcelUtil {
 			}
 			return maps;
 		} catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		}
 		return null;

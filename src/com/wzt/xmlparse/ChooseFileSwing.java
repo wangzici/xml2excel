@@ -158,7 +158,6 @@ public class ChooseFileSwing {
 		
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			// TODO Auto-generated method stub
 			System.out.println("from = " + fromTF.getText() + "; toDirpath = " + toDirTF.getText());
 			String fromPath = fromTF.getText();
 			String toDirPath = toDirTF.getText();

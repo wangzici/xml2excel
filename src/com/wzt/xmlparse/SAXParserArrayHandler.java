@@ -17,7 +17,6 @@ public class SAXParserArrayHandler extends DefaultHandler {
 	
 	@Override
 	public void startDocument() throws SAXException {
-		// TODO Auto-generated method stub
 		super.startDocument();
 		arraylist = new ArrayList<String>();
 		map = new HashMap<String,ArrayList<String>>();
@@ -26,7 +25,6 @@ public class SAXParserArrayHandler extends DefaultHandler {
 	
 	public void startElement(String uri, String localName, String qName,
 			Attributes attributes) throws SAXException {
-		// TODO Auto-generated method stub
 		super.startElement(uri, localName, qName, attributes);
 		mType = qName.trim();
 		System.out.println("uri = " + uri + "; localName = " + localName + "; qName = " + qName);
@@ -46,7 +44,6 @@ public class SAXParserArrayHandler extends DefaultHandler {
 	
 	public void endElement(String uri, String localName, String qName)
 			throws SAXException {
-		// TODO Auto-generated method stub
 		super.endElement(uri, localName, qName);
 		if("string-array".equals(qName)){
 			ArrayList<String> temp = (ArrayList<String>) arraylist.clone();
@@ -61,7 +58,6 @@ public class SAXParserArrayHandler extends DefaultHandler {
 	
 	public void characters(char[] ch, int start, int length)
 			throws SAXException {
-		// TODO Auto-generated method stub
 		super.characters(ch, start, length);
 		if("item".equals(mType)){
 			strBuilder.append(new String(ch, start, length));
@@ -71,7 +67,6 @@ public class SAXParserArrayHandler extends DefaultHandler {
 	
 	@Override
 	public void endDocument() throws SAXException {
-		// TODO Auto-generated method stub
 		super.endDocument();
 		System.out.println("endDocument ; map = " + map.toString());
 	}

@@ -6,7 +6,6 @@ import java.io.FilenameFilter;
 public class ValueFileFilter implements FilenameFilter{
 
 	public boolean accept(File dir, String name) {
-		// TODO Auto-generated method stub
 		System.out.println("dir = " + dir.getAbsolutePath());
 		if(dir.exists()&& dir.getName().startsWith("values")){
 			return true;

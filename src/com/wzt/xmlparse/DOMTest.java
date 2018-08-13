@@ -1,4 +1,7 @@
 package com.wzt.xmlparse;
+import com.wzt.xmlparse.utils.CommonUtils;
+import com.wzt.xmlparse.utils.FileUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -21,55 +24,54 @@ public class DOMTest {
 	public static boolean xml2xls(String resFileDirPath,String xlsFileDirPath){
 		File xlsFileDir = new File(xlsFileDirPath);
 		File resFileDir = new File(resFileDirPath);
-		if(!xlsFileDir.exists())
+		if (!xlsFileDir.exists() || !resFileDir.exists()) {
 			return false;
-		if(!resFileDir.exists())
+		}
+		File translateXLS = new File(xlsFileDir.getAbsolutePath() , Constants.FILE_NAME_TRANSLATE);
+		FileUtils.deleteFile(translateXLS);
+		ExcelUtil.createExcel(translateXLS);
+		File[] fileList = resFileDir.listFiles();
+		if (CommonUtils.isEmpty(fileList)) {
 			return false;
-		File translateXLS = new File(xlsFileDir.getAbsolutePath() + "/translate.xls");
-		if(translateXLS.exists()){
-			translateXLS.delete();
 		}
-		try {
-			ExcelUtil.createEcel(translateXLS);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		File[] filelist = resFileDir.listFiles();
-		System.out.println("filelist.size = " + filelist.length);
-		
-		ArrayList<File> stringFileList = new ArrayList<File>();
-		ArrayList<File> arrayFileList = new ArrayList<File>();
-		for(int i=0;i < filelist.length;i++){
-			File valuesDir = filelist[i];
-			System.out.println("valuesDir = " + valuesDir.getAbsolutePath());
-			File stringFile = new File(valuesDir.getAbsolutePath() + "/strings.xml");
-			File arrayFile = new File(valuesDir.getAbsolutePath() + "/arrays.xml");
-			if(stringFile.exists())
+		System.out.println("fileList.size = " + fileList.length);
+
+		ArrayList<File> stringFileList = new ArrayList<>();
+		ArrayList<File> arrayFileList = new ArrayList<>();
+		//过滤出所有strings.xml与arrays.xml
+		for(File valuesDir : fileList){
+			String valuesPath = valuesDir.getAbsolutePath();
+			System.out.println("valuesDir = " + valuesPath);
+
+			File stringFile = new File(valuesPath, Constants.FILE_NAME_STRINGS);
+			if(stringFile.exists()) {
 				stringFileList.add(stringFile);
-			if(arrayFile.exists())
+			}
+
+			File arrayFile = new File(valuesPath, Constants.FILE_NAME_ARRAYS);
+			if(arrayFile.exists()) {
 				arrayFileList.add(arrayFile);
+			}
 		}
-		System.out.println("stringFileList = " + stringFileList.toString());
-		System.out.println("arrayFileList = " + arrayFileList.toString());
+
+		//遍历所有strings.xml
 		for(File stringFile:stringFileList){
 			Map<String, String> map = xmlStringParse(stringFile);
 			String parentName = stringFile.getParentFile().getName();
 			try {
 				ExcelUtil.writeStringExcel(translateXLS, map , parentName);
 			} catch (Exception e) {
-				// TODO: handle exception
 				e.printStackTrace();
 				return false;
 			}
 		}
+		//遍历所有arrays.xml
 		for(File arrayFile:arrayFileList){
 			Map<String, ArrayList<String>> map = xmlArrayParse(arrayFile);
 			String parentName = arrayFile.getParentFile().getName();
 			try {
 				ExcelUtil.writeArrayExcel(translateXLS, map , parentName);
 			} catch (Exception e) {
-				// TODO: handle exception
 				e.printStackTrace();
 				return false;
 			}
@@ -85,7 +87,6 @@ public class DOMTest {
 		try {
 			excel2xml(xlsFile,xmlFileDir);
 		} catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 			return false;
 		}
@@ -101,7 +102,6 @@ public class DOMTest {
 			parser.parse(file, handler);
 			return handler.getXmlValue();
 		} catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		}
 		return null;
@@ -115,7 +115,6 @@ public class DOMTest {
 			parser.parse(file, handler);
 			return handler.getXmlValue();
 		} catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		}
 		return null;
@@ -168,7 +167,6 @@ public class DOMTest {
 				handler.endElement("", "resources", "resources");
 				handler.endDocument();
 			} catch (Exception e) {
-				// TODO: handle exception
 				e.printStackTrace();
 			}
 		}
@@ -177,7 +175,7 @@ public class DOMTest {
 	private static void createArrayXmls(ArrayList<ValuesDir> valuesarrayList,File FileDir){
 		for(ValuesDir valuesDir : valuesarrayList){
 			String fileDirName = valuesDir.getTitle();
-			Map<String, ArrayList<String>> map = valuesDir.getArrayMap();
+			Map<String, ArrayList<String>> map = valuesDir.getmArraysmap();
 			System.out.println(map.toString());
 			/*for(Map.Entry<String,ArrayList<String>> entry : map.entrySet()){
 
