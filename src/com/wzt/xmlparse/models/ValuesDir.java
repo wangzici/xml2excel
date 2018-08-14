@@ -3,26 +3,26 @@ package com.wzt.xmlparse.models;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class ValuesDir{
+public class ValuesDir {
     private String mTitle;
-    private Map<String,String> mStringmap;
-    private Map<String,ArrayList<String>> mArraysmap;
+    private Map<String, String> mStringMap;
+    private Map<String, ArrayList<String>> mArraysMap;
 
-    public ValuesDir(String title,Map<String,String> stringmap,Map<String,ArrayList<String>> arraysmap){
-        mTitle = title == null ? "": title;
-        mStringmap = stringmap;
-        mArraysmap = arraysmap;
+    public ValuesDir(String title, Map<String, String> stringMap, Map<String, ArrayList<String>> arraysmap) {
+        mTitle = title == null ? "" : title;
+        mStringMap = stringMap;
+        mArraysMap = arraysmap;
     }
 
     public String getTitle() {
         return mTitle;
     }
 
-    public Map<String, String> getmStringmap() {
-        return mStringmap;
+    public Map<String, String> getStringMap() {
+        return mStringMap;
     }
 
-    public Map<String, ArrayList<String>> getmArraysmap() {
-        return mArraysmap;
+    public Map<String, ArrayList<String>> getArraysMap() {
+        return mArraysMap;
     }
 }
