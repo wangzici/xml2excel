@@ -1,11 +1,14 @@
 package com.wzt.xmlparse.utils;
 
+import com.wzt.xmlparse.models.ArrayFile;
+import com.wzt.xmlparse.models.StringFile;
 import com.wzt.xmlparse.models.ValuesDir;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -38,7 +41,7 @@ public class ExcelUtil {
 
     }
 
-    public static void writeArrayExcel(File file, Map<String, ArrayList<String>> map, String parentName) throws IOException, RowsExceededException, WriteException, JXLException {
+    public static void writeArrayExcel(File file, ArrayFile arrayFile, String parentName) throws IOException, JXLException {
         if (!file.exists()) {
             createExcel(file);
         }
@@ -64,22 +67,22 @@ public class ExcelUtil {
             rows[i] = sheet.getCell(0, i).getContents();
         }
 
-        int row = 1;
-        for (Map.Entry<String, ArrayList<String>> entry : map.entrySet()) {
-            String name = entry.getKey();
-            ArrayList<String> arraylist = entry.getValue();
+        int row = -1;
+        for (ArrayFile.ArrayItem arrayItem : arrayFile.getArrays()) {
+            String name = arrayItem.getName();
+            List<String> arrayList = arrayItem.getValues();
             for (int i = 1; i < rows.length; i++) {
                 if (name.equals(rows[i])) {
                     row = i;
                     break;
                 }
-                if (i == rows.length - 1) {
-                    row = rows.length;
-                }
+            }
+            if (row == -1) {
+                row = rows.length;
             }
             Label labelName = new Label(0, row, name);
             sheet.addCell(labelName);
-            for (String str : arraylist) {
+            for (String str : arrayList) {
                 Label labelValue = new Label(column, row, str);
                 sheet.addCell(labelValue);
                 row++;
@@ -90,7 +93,7 @@ public class ExcelUtil {
         workbook.close();
     }
 
-    public static void writeStringExcel(File file, Map<String, String> map, String parentName) throws IOException, RowsExceededException, WriteException, JXLException {
+    public static void writeStringExcel(File file, StringFile stringFile, String parentName) throws IOException, JXLException {
         if (!file.exists()) {
             createExcel(file);
         }
@@ -100,12 +103,14 @@ public class ExcelUtil {
         WritableSheet sheet = workbook.getSheet("strings");
 
         int column = -1;
+        //首先查找是否有相同的value文件夹名字
         for (int i = 1; i < sheet.getColumns(); i++) {
             String title = sheet.getCell(i, 0).getContents();
             if (title.equals(parentName)) {
                 column = i;
             }
         }
+        //如果没有相同的value文件夹，则新创建一列
         if (column == -1) {
             column = sheet.getColumns();
             Label labelTitle = new Label(column, 0, parentName);
@@ -117,18 +122,19 @@ public class ExcelUtil {
             rows[i] = sheet.getCell(0, i).getContents();
         }
 
-        int row = 1;
-        for (Map.Entry<String, String> entry : map.entrySet()) {
+        int row = -1;
+        for (Map.Entry<String, String> entry : stringFile.getValues().entrySet()) {
             String name = entry.getKey();
             String value = entry.getValue();
             for (int i = 1; i < rows.length; i++) {
                 if (name.equals(rows[i])) {
+                    //如果有相同的name,则直接放到同一行显示
                     row = i;
                     break;
                 }
-                if (i == rows.length - 1) {
-                    row = rows.length;
-                }
+            }
+            if (row == -1) {
+                row = rows.length;
             }
             Label labelName = new Label(0, row, name);
             sheet.addCell(labelName);
@@ -171,6 +177,7 @@ public class ExcelUtil {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static ArrayList<ValuesDir> getArrayExcel(File file) {
         if (!file.exists())
             return null;

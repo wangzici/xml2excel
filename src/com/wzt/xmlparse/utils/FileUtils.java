@@ -14,4 +14,14 @@ public class FileUtils {
             }
         }
     }
+
+    public static void createDir(@NotNull File file) {
+        if (!file.exists()) {
+            if (file.mkdirs()) {
+                //TODO: print create dir success
+            } else {
+                //TODO: print create dir fail
+            }
+        }
+    }
 }

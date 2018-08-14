@@ -150,7 +150,7 @@ public class ChooseFileSwing {
         JTextField fromTF;
         JTextField toDirTF;
         JLabel label;
-        int type = -1;
+        int type;
 
         public ClickListener(JTextField fromTF, JTextField toDirTF, JLabel label, int type) {
             this.fromTF = fromTF;

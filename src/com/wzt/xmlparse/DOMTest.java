@@ -1,5 +1,7 @@
 package com.wzt.xmlparse;
 
+import com.wzt.xmlparse.models.ArrayFile;
+import com.wzt.xmlparse.models.StringFile;
 import com.wzt.xmlparse.models.ValuesDir;
 import com.wzt.xmlparse.utils.CommonUtils;
 import com.wzt.xmlparse.utils.ExcelUtil;
@@ -44,10 +46,8 @@ public class DOMTest {
         //过滤出所有strings.xml与arrays.xml
         for (File valuesDir : fileList) {
             String valuesPath = valuesDir.getAbsolutePath();
-            System.out.println("valuesDir = " + valuesPath);
 
             File stringFile = new File(valuesPath, Constants.FILE_NAME_STRINGS);
-            System.out.println("stringFile.path = " + stringFile.getAbsolutePath());
             if (stringFile.exists()) {
                 stringFileList.add(stringFile);
             }
@@ -60,10 +60,10 @@ public class DOMTest {
 
         //遍历所有strings.xml
         for (File stringFile : stringFileList) {
-            Map<String, String> map = xmlStringParse(stringFile);
+            StringFile myStringFile = parseStringXML(stringFile);
             String parentName = stringFile.getParentFile().getName();
             try {
-                ExcelUtil.writeStringExcel(translateXLS, map, parentName);
+                ExcelUtil.writeStringExcel(translateXLS, myStringFile, parentName);
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -71,10 +71,10 @@ public class DOMTest {
         }
         //遍历所有arrays.xml
         for (File arrayFile : arrayFileList) {
-            Map<String, ArrayList<String>> map = xmlArrayParse(arrayFile);
+            ArrayFile myArrayFile = xmlArrayParse(arrayFile);
             String parentName = arrayFile.getParentFile().getName();
             try {
-                ExcelUtil.writeArrayExcel(translateXLS, map, parentName);
+                ExcelUtil.writeArrayExcel(translateXLS, myArrayFile, parentName);
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -98,7 +98,7 @@ public class DOMTest {
     }
 
 
-    private static Map<String, ArrayList<String>> xmlArrayParse(File file) {
+    private static ArrayFile xmlArrayParse(File file) {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
             SAXParser parser = factory.newSAXParser();
@@ -111,7 +111,7 @@ public class DOMTest {
         return null;
     }
 
-    private static Map<String, String> xmlStringParse(File file) {
+    private static StringFile parseStringXML(File file) {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
             SAXParser parser = factory.newSAXParser();
@@ -125,24 +125,20 @@ public class DOMTest {
     }
 
     private static void excel2xml(File excelFile, File FileDir) {
-        createStringXmls(ExcelUtil.getStringExcel(excelFile), FileDir);
-        createArrayXmls(ExcelUtil.getArrayExcel(excelFile), FileDir);
+        createStringXMLs(ExcelUtil.getStringExcel(excelFile), FileDir);
+        createArrayXMLs(ExcelUtil.getArrayExcel(excelFile), FileDir);
     }
 
-    private static void createStringXmls(Map<String, Map<String, String>> maps, File FileDir) {
-        for (Map.Entry<String, Map<String, String>> entrys : maps.entrySet()) {
-            String fileDirName = entrys.getKey();
-            Map<String, String> map = entrys.getValue();
+    private static void createStringXMLs(Map<String, Map<String, String>> maps, File FileDir) {
+        for (Map.Entry<String, Map<String, String>> mapEntry : maps.entrySet()) {
+            String fileDirName = mapEntry.getKey();
+            Map<String, String> map = mapEntry.getValue();
             File resFile = new File(FileDir.getAbsolutePath() + "/res_translate");
-            if (!resFile.exists())
-                resFile.mkdir();
+            FileUtils.createDir(resFile);
             File valueFile = new File(resFile.getAbsolutePath() + "/" + fileDirName);
-            if (!valueFile.exists())
-                valueFile.mkdir();
-            File xmlFile = new File(valueFile.getAbsolutePath() + "/strings.xml");
-            if (xmlFile.exists()) {
-                xmlFile.delete();
-            }
+            FileUtils.createDir(valueFile);
+            File xmlFile = new File(valueFile.getAbsolutePath(), Constants.FILE_NAME_STRINGS);
+            FileUtils.deleteFile(xmlFile);
 
 
             try {
@@ -156,15 +152,15 @@ public class DOMTest {
                 handler.setResult(result);
 
                 handler.startDocument();
-                AttributesImpl atts = new AttributesImpl();
-                atts.clear();
-                atts.addAttribute("", "xmlns:xliff", "xmlns:xliff", "string", "urn:oasis:names:tc:xliff:document:1.2");
-                handler.startElement("", "resources", "resources", atts);
+                AttributesImpl attrs = new AttributesImpl();
+                attrs.clear();
+                attrs.addAttribute("", "xmlns:xliff", "xmlns:xliff", "string", "urn:oasis:names:tc:xliff:document:1.2");
+                handler.startElement("", "resources", "resources", attrs);
 
                 for (Map.Entry<String, String> entry : map.entrySet()) {
-                    atts.clear();
-                    atts.addAttribute("", "name", "name", "string", entry.getKey());
-                    handler.startElement("", "string", "string", atts);
+                    attrs.clear();
+                    attrs.addAttribute("", "name", "name", "string", entry.getKey());
+                    handler.startElement("", "string", "string", attrs);
                     handler.characters(entry.getValue().toCharArray(), 0, entry.getValue().length());
                     handler.endElement("", "string", "string");
                 }
@@ -176,25 +172,18 @@ public class DOMTest {
         }
     }
 
-    private static void createArrayXmls(ArrayList<ValuesDir> valuesarrayList, File FileDir) {
+    private static void createArrayXMLs(ArrayList<ValuesDir> valuesarrayList, File FileDir) {
         for (ValuesDir valuesDir : valuesarrayList) {
             String fileDirName = valuesDir.getTitle();
             Map<String, ArrayList<String>> map = valuesDir.getArraysMap();
             System.out.println(map.toString());
-			/*for(Map.Entry<String,ArrayList<String>> entry : map.entrySet()){
 
-			}*/
             File resFile = new File(FileDir.getAbsolutePath() + "/res_translate");
-            if (!resFile.exists())
-                resFile.mkdir();
+            FileUtils.createDir(resFile);
             File valueFile = new File(resFile.getAbsolutePath() + "/" + fileDirName);
-            if (!valueFile.exists())
-                valueFile.mkdir();
-            File xmlFile = new File(valueFile.getAbsolutePath() + "/arrays.xml");
-            if (xmlFile.exists()) {
-                xmlFile.delete();
-            }
-
+            FileUtils.createDir(valueFile);
+            File xmlFile = new File(valueFile.getAbsolutePath() , Constants.FILE_NAME_ARRAYS);
+            FileUtils.deleteFile(xmlFile);
 
             try {
                 SAXTransformerFactory factory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();

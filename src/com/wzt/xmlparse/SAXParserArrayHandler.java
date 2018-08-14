@@ -1,5 +1,7 @@
 package com.wzt.xmlparse;
 
+import com.wzt.xmlparse.models.ArrayFile;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,18 +10,19 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+@SuppressWarnings("unchecked")
 public class SAXParserArrayHandler extends DefaultHandler {
-    String mName;
-    ArrayList<String> arraylist;
-    Map<String, ArrayList<String>> map;
-    String mType;
-    StringBuilder strBuilder;
+    private String mName;
+    private ArrayList<String> arrayList;
+    private ArrayFile mArrayFile;
+    private String mType;
+    private StringBuilder strBuilder;
 
     @Override
     public void startDocument() throws SAXException {
         super.startDocument();
-        arraylist = new ArrayList<>();
-        map = new HashMap<>();
+        arrayList = new ArrayList<>();
+        mArrayFile = new ArrayFile();
         strBuilder = new StringBuilder();
     }
 
@@ -27,14 +30,13 @@ public class SAXParserArrayHandler extends DefaultHandler {
                              Attributes attributes) throws SAXException {
         super.startElement(uri, localName, qName, attributes);
         mType = qName.trim();
-        System.out.println("uri = " + uri + "; localName = " + localName + "; qName = " + qName);
         if ("string-array".equals(qName)) {
             int num = attributes.getLength();
             for (int i = 0; i < num; i++) {
                 if ("name".equals(attributes.getQName(i))) {
                     String value = attributes.getValue(i);
                     mName = value;
-                    System.out.println("value = " + value);
+                    System.out.println("name = " + value);
                 }
             }
         } else if ("item".equals(qName)) {
@@ -46,13 +48,12 @@ public class SAXParserArrayHandler extends DefaultHandler {
             throws SAXException {
         super.endElement(uri, localName, qName);
         if ("string-array".equals(qName)) {
-            ArrayList<String> temp = (ArrayList<String>) arraylist.clone();
-            map.put(mName, temp);
+            ArrayList<String> temp = (ArrayList<String>) arrayList.clone();
+            mArrayFile.putArray(mName, temp);
             mName = null;
-            arraylist.clear();
-            System.out.println("endElement ; localName = " + localName + "; qName = " + qName);
+            arrayList.clear();
         } else if ("item".equals(qName)) {
-            arraylist.add(strBuilder.toString());
+            arrayList.add(strBuilder.toString());
         }
     }
 
@@ -61,17 +62,15 @@ public class SAXParserArrayHandler extends DefaultHandler {
         super.characters(ch, start, length);
         if ("item".equals(mType)) {
             strBuilder.append(new String(ch, start, length));
-            System.out.println("[characters] strBuilder = " + strBuilder.toString());
         }
     }
 
     @Override
     public void endDocument() throws SAXException {
         super.endDocument();
-        System.out.println("endDocument ; map = " + map.toString());
     }
 
-    public Map<String, ArrayList<String>> getXmlValue() {
-        return map;
+    public ArrayFile getXmlValue() {
+        return mArrayFile;
     }
 }
