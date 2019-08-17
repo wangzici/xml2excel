@@ -10,6 +10,7 @@ import com.wzt.xmlparse.utils.FileUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
@@ -24,9 +25,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.xml.sax.helpers.AttributesImpl;
 
 
-public class DOMTest {
+class DOMTest {
 
-    public static boolean xml2xls(String resFileDirPath, String xlsFileDirPath) {
+    static boolean xml2xls(String resFileDirPath, String xlsFileDirPath) {
         File xlsFileDir = new File(xlsFileDirPath);
         File resFileDir = new File(resFileDirPath);
         if (!xlsFileDir.exists() || !resFileDir.exists()) {
@@ -83,7 +84,7 @@ public class DOMTest {
         return true;
     }
 
-    public static boolean xls2xml(String xlsFilePath, String xmlFileDirPath) {
+    static boolean xls2xml(String xlsFilePath, String xmlFileDirPath) {
         File xlsFile = new File(xlsFilePath);
         File xmlFileDir = new File(xmlFileDirPath);
         if (!xlsFile.exists() || !xmlFileDir.exists())
@@ -129,10 +130,11 @@ public class DOMTest {
         createArrayXMLs(ExcelUtil.getArrayExcel(excelFile), FileDir);
     }
 
-    private static void createStringXMLs(Map<String, Map<String, String>> maps, File FileDir) {
-        for (Map.Entry<String, Map<String, String>> mapEntry : maps.entrySet()) {
-            String fileDirName = mapEntry.getKey();
-            Map<String, String> map = mapEntry.getValue();
+    private static void createStringXMLs(List<StringFile> stringFiles, File FileDir) {
+        for (StringFile stringFile : stringFiles) {
+            //遍历所有stringFile文件
+            String fileDirName = stringFile.getDirName();
+            Map<String, String> map = stringFile.getValues();
             File resFile = new File(FileDir.getAbsolutePath() + "/res_translate");
             FileUtils.createDir(resFile);
             File valueFile = new File(resFile.getAbsolutePath() + "/" + fileDirName);
@@ -158,6 +160,7 @@ public class DOMTest {
                 handler.startElement("", "resources", "resources", attrs);
 
                 for (Map.Entry<String, String> entry : map.entrySet()) {
+                    //遍历一个StringFile的所有item
                     attrs.clear();
                     attrs.addAttribute("", "name", "name", "string", entry.getKey());
                     handler.startElement("", "string", "string", attrs);

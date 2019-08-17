@@ -6,21 +6,24 @@ import java.io.File;
 
 public class FileUtils {
     public static void deleteFile(@NotNull File file) {
+        System.out.println("[deleteFile] filePath = " + file.getAbsolutePath());
+
         if (file.exists()) {
             if (file.delete()) {
-                //TODO: print delete file success
+                System.out.println("[deleteFile]delete success!");
             } else {
-                //TODO: print delete file fail
+                System.out.println("[deleteFile]delete fail!");
             }
         }
     }
 
     public static void createDir(@NotNull File file) {
+        System.out.println("[createDir] filePath = " + file.getAbsolutePath());
         if (!file.exists()) {
             if (file.mkdirs()) {
-                //TODO: print create dir success
+                System.out.println("[createDir]create success!");
             } else {
-                //TODO: print create dir fail
+                System.out.println("[createDir]create fail!");
             }
         }
     }

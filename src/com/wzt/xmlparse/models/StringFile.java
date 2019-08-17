@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class StringFile {
     private Map<String, String> values = new LinkedHashMap<>();
+    private String dirName = "";
 
     public String getValue(String name) {
         return values.get(name);
@@ -16,5 +17,13 @@ public class StringFile {
 
     public void put(String name, String value) {
         values.put(name, value);
+    }
+
+    public String getDirName() {
+        return dirName;
+    }
+
+    public void setDirName(String dirName) {
+        this.dirName = dirName;
     }
 }
